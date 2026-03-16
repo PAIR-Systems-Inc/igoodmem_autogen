@@ -43,6 +43,7 @@ llama-cpp = [
 
 graphrag = ["graphrag>=2.3.0"]
 chromadb = ["chromadb>=1.0.0"]
+goodmem = ["httpx>=0.27.0"]
 mem0 = ["mem0ai>=0.1.98"]
 mem0-local = [
     "mem0ai>=0.1.98",
