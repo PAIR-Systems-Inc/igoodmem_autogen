@@ -97,3 +97,7 @@ class GoodMemMemoryConfig(BaseModel):
     metadata: Optional[Dict[str, str]] = Field(
         default=None, description="Default metadata to attach to all memories created via add()"
     )
+    verify_ssl: bool = Field(
+        default=True,
+        description="Whether to verify SSL certificates. Set to False for self-signed certificates.",
+    )
