@@ -27,14 +27,15 @@ from autogen_core.memory import MemoryContent, MemoryMimeType
 
 # ── Configuration ────────────────────────────────────────────────────
 
-GOODMEM_API_KEY = os.environ.get("GOODMEM_API_KEY", "gm_rttn7pla4rm3ry6hqakfnnaal4")
-GOODMEM_BASE_URL = os.environ.get("GOODMEM_BASE_URL", "http://localhost:8080")
-# Use Voyage embedder (confirmed working)
-EMBEDDER_ID = os.environ.get("GOODMEM_EMBEDDER_ID", "019c2aff-c470-778d-9f4e-89a74c77890f")
-PDF_FILE_PATH = os.environ.get(
-    "GOODMEM_PDF_PATH",
-    "/home/bashar/Downloads/New Quran.com Search Analysis (Nov 26, 2025)-1.pdf",
-)
+GOODMEM_API_KEY = os.environ.get("GOODMEM_API_KEY", "")
+GOODMEM_BASE_URL = os.environ.get("GOODMEM_BASE_URL", "https://localhost:8080")
+EMBEDDER_ID = os.environ.get("GOODMEM_EMBEDDER_ID", "")
+PDF_FILE_PATH = os.environ.get("GOODMEM_PDF_PATH", "")
+
+if not GOODMEM_API_KEY:
+    raise RuntimeError("GOODMEM_API_KEY env var is required. Set it to a valid GoodMem API key.")
+if not EMBEDDER_ID:
+    raise RuntimeError("GOODMEM_EMBEDDER_ID env var is required. Set it to a valid embedder UUID.")
 
 # Shared space name for all tests in this module
 TEST_SPACE_NAME = f"autogen-test-{uuid.uuid4().hex[:8]}"
@@ -51,6 +52,7 @@ def _make_config() -> GoodMemMemoryConfig:
         embedder_id=EMBEDDER_ID,
         max_results=5,
         wait_for_indexing=True,
+        verify_ssl=False,
     )
 
 

@@ -31,10 +31,15 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 
 # ── Configuration ────────────────────────────────────────────────────
 
-GOODMEM_API_KEY = os.environ.get("GOODMEM_API_KEY", "gm_rttn7pla4rm3ry6hqakfnnaal4")
+GOODMEM_API_KEY = os.environ.get("GOODMEM_API_KEY", "")
 GOODMEM_BASE_URL = os.environ.get("GOODMEM_BASE_URL", "https://localhost:8080")
-EMBEDDER_ID = os.environ.get("GOODMEM_EMBEDDER_ID", "019cfd11-6ea9-75c8-925c-6a202a517513")
+EMBEDDER_ID = os.environ.get("GOODMEM_EMBEDDER_ID", "")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+
+if not GOODMEM_API_KEY:
+    raise RuntimeError("GOODMEM_API_KEY env var is required. Set it to a valid GoodMem API key.")
+if not EMBEDDER_ID:
+    raise RuntimeError("GOODMEM_EMBEDDER_ID env var is required. Set it to a valid embedder UUID.")
 
 TEST_SPACE_NAME = f"agent-integration-test-{uuid.uuid4().hex[:8]}"
 
