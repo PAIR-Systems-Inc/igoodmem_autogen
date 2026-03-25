@@ -1,16 +1,14 @@
-<a name="readme-top"></a>
-
 <div align="center">
 
-<img src="https://goodmem.ai/assets/goodmem-g-blue-VvWv6-me.png" alt="GoodMem Logo" width="100">&nbsp;&nbsp;&nbsp;X&nbsp;&nbsp;&nbsp;<img src="https://microsoft.github.io/autogen/0.2/img/ag.svg" alt="AutoGen Logo" width="100">
+<img src="https://goodmem.ai/assets/goodmem-g-blue-VvWv6-me.png" alt="GoodMem Logo" width="90">&nbsp;&nbsp;&nbsp;**X**&nbsp;&nbsp;&nbsp;<img src="https://microsoft.github.io/autogen/0.2/img/ag.svg" alt="AutoGen Logo" width="100">
+
+</div>
 
 # GoodMem × AutoGen
 
 **[GoodMem](https://goodmem.ai)** integration for **[AutoGen](https://github.com/microsoft/autogen)**: persistent semantic memory for multi-agent AI applications.
 
 This fork adds a GoodMem memory backend to AutoGen, enabling agents to store, retrieve, and reason over long-term memories using vector embeddings. Available for both Python and .NET.
-
-</div>
 
 ## Overview
 
