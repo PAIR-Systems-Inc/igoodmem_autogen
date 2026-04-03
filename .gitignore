@@ -1,5 +1,9 @@
 .docusaurus/
 node_modules/
+
+# igoodmem_autogen specific files to ignore
+python/packages/autogen-ext/tests/test_goodmem_results.md
+
 # Project
 /.vs
 # Visual Studio 2015/2017 cache/options directory

@@ -1,6 +1,6 @@
-""" vector memory implementation for AutoGen.
+"""GoodMem vector memory implementation for AutoGen.
 
-Provides semantic memory storage and retrieval using the  API,
+Provides semantic memory storage and retrieval using the GoodMem API,
 supporting text and file-based (PDF, DOCX, images, etc.) memory creation
 with vector embeddings.
 """
@@ -26,13 +26,13 @@ logger = logging.getLogger(__name__)
 
 
 class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
-    """Store and retrieve memory using the  API with vector similarity search.
+    """Store and retrieve memory using the GoodMem API with vector similarity search.
 
-    ``Memory`` provides a cloud/self-hosted memory implementation that uses
-    the  API for storing documents (text and files) as memories with vector
+    ``GoodMemMemory`` provides a cloud/self-hosted memory implementation that uses
+    the GoodMem API for storing documents (text and files) as memories with vector
     embeddings and performing semantic similarity-based retrieval.
 
-    This implementation mirrors the reference Activepieces  integration,
+    This implementation mirrors the reference Activepieces GoodMem integration,
     adapted idiomatically for AutoGen's Python ecosystem. It supports:
 
     - **Create Space** — Create or reuse a named space with a configured embedder
@@ -47,10 +47,10 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
 
     .. code-block:: bash
 
-        pip install "autogen-ext[]"
+        pip install "autogen-ext[goodmem]"
 
     Args:
-        config: Configuration for the  memory connection.
+        config: Configuration for the GoodMem memory connection.
 
     Example:
 
@@ -59,12 +59,12 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
             import asyncio
             from autogen_agentchat.agents import AssistantAgent
             from autogen_core.memory import MemoryContent, MemoryMimeType
-            from autogen_ext.memory. import Memory, MemoryConfig
+            from autogen_ext.memory.goodmem import GoodMemMemory, GoodMemMemoryConfig
             from autogen_ext.models.openai import OpenAIChatCompletionClient
 
             async def main() -> None:
-                memory = Memory(
-                    config=MemoryConfig(
+                memory = GoodMemMemory(
+                    config=GoodMemMemoryConfig(
                         base_url="http://localhost:8080",
                         api_key="gm_your_api_key",
                         space_name="my-knowledge-base",
@@ -137,6 +137,12 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
                 f"{self._base_url}/v1/spaces",
                 headers=self._headers,
             )
+            if response.status_code == 401:
+                raise httpx.HTTPStatusError(
+                    f"Authentication failed (401) for {self._base_url}. Check your API key.",
+                    request=response.request,
+                    response=response,
+                )
             response.raise_for_status()
             body = response.json()
             spaces = body if isinstance(body, list) else body.get("spaces", [])
@@ -144,8 +150,10 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
             for space in spaces:
                 if space.get("name") == self._config.space_name:
                     self._space_id = space.get("spaceId") or space.get("id")
-                    logger.info(f"Reusing existing  space: {self._config.space_name} ({self._space_id})")
+                    logger.info(f"Reusing existing GoodMem space: {self._config.space_name} ({self._space_id})")
                     return self._space_id  # type: ignore[return-value]
+        except httpx.HTTPStatusError:
+            raise
         except Exception:
             logger.debug("Failed to list spaces, will attempt to create")
 
@@ -185,7 +193,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
             for space in spaces:
                 if space.get("name") == self._config.space_name:
                     self._space_id = space.get("spaceId") or space.get("id")
-                    logger.info(f"Reusing existing  space after 409: {self._config.space_name} ({self._space_id})")
+                    logger.info(f"Reusing existing GoodMem space after 409: {self._config.space_name} ({self._space_id})")
                     return self._space_id  # type: ignore[return-value]
             # If still not found after 409, raise the original error
             response.raise_for_status()
@@ -193,7 +201,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         response.raise_for_status()
         result = response.json()
         self._space_id = result.get("spaceId") or result.get("id")
-        logger.info(f"Created  space: {self._config.space_name} ({self._space_id})")
+        logger.info(f"Created GoodMem space: {self._config.space_name} ({self._space_id})")
         return self._space_id  # type: ignore[return-value]
 
     # ── Core Memory Interface ──────────────────────────────────────────
@@ -202,10 +210,10 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         self,
         model_context: ChatCompletionContext,
     ) -> UpdateContextResult:
-        """Update the model context with relevant memories from .
+        """Update the model context with relevant memories from GoodMem.
 
         Extracts the query from the last message in the context, performs a
-        semantic retrieval against , and injects matching results as
+        semantic retrieval against GoodMem, and injects matching results as
         a system message.
         """
         messages = await model_context.get_messages()
@@ -225,7 +233,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         return UpdateContextResult(memories=query_results)
 
     async def add(self, content: MemoryContent, cancellation_token: CancellationToken | None = None) -> None:
-        """Add a text memory to .
+        """Add a text memory to GoodMem.
 
         For file-based memories (PDF, images, etc.), use :meth:`add_file` instead.
 
@@ -239,7 +247,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         text = content.content
         if not isinstance(text, str):
             raise ValueError(
-                "Memory.add() only supports text content. "
+                "GoodMemMemory.add() only supports text content. "
                 "Use add_file() for binary files (PDF, images, etc.)."
             )
 
@@ -265,7 +273,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         )
         response.raise_for_status()
         result = response.json()
-        logger.info(f"Created  memory: {result.get('memoryId')}")
+        logger.info(f"Created GoodMem memory: {result.get('memoryId')}")
 
     async def add_file(
         self,
@@ -273,7 +281,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         metadata: Optional[Dict[str, Any]] = None,
         cancellation_token: CancellationToken | None = None,
     ) -> Dict[str, Any]:
-        """Add a file (PDF, DOCX, image, etc.) as a memory to .
+        """Add a file (PDF, DOCX, image, etc.) as a memory to GoodMem.
 
         Mirrors the reference integration's file handling: auto-detects content type
         from the file extension, encodes binary files as base64, and decodes text
@@ -327,7 +335,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         )
         response.raise_for_status()
         result = response.json()
-        logger.info(f"Created  file memory: {result.get('memoryId')} ({path.name})")
+        logger.info(f"Created GoodMem file memory: {result.get('memoryId')} ({path.name})")
 
         return {
             "memoryId": result.get("memoryId"),
@@ -343,7 +351,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         cancellation_token: CancellationToken | None = None,
         **kwargs: Any,
     ) -> MemoryQueryResult:
-        """Query  for semantically similar memories.
+        """Query GoodMem for semantically similar memories.
 
         Mirrors the reference integration's retrieve-memories logic including
         wait-for-indexing polling, NDJSON/SSE response parsing, and optional
@@ -390,7 +398,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
                 config["chronological_resort"] = True
 
             request_body["postProcessor"] = {
-                "name": "com..retrieval.postprocess.ChatPostProcessorFactory",
+                "name": "com.goodmem.retrieval.postprocess.ChatPostProcessorFactory",
                 "config": config,
             }
 
@@ -448,12 +456,12 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         return MemoryQueryResult(results=last_results)
 
     async def clear(self) -> None:
-        """Clear is not directly supported by  API.
+        """Clear is not directly supported by GoodMem API.
 
         To remove all memories, delete them individually or delete the space.
         """
         logger.warning(
-            " does not support bulk clear. "
+            "GoodMem does not support bulk clear. "
             "Use delete_memory() for individual memories or recreate the space."
         )
 
@@ -464,7 +472,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         self._client = None
         self._space_id = None
 
-    # ── Extended  Operations ────────────────────────────────────
+    # ── Extended GoodMem Operations ────────────────────────────────────
 
     async def get_memory(
         self,
@@ -522,11 +530,11 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
             headers=self._headers,
         )
         response.raise_for_status()
-        logger.info(f"Deleted  memory: {memory_id}")
+        logger.info(f"Deleted GoodMem memory: {memory_id}")
         return {"memoryId": memory_id, "success": True}
 
     async def list_embedders(self) -> List[Dict[str, Any]]:
-        """List available embedder models from the  API.
+        """List available embedder models from the GoodMem API.
 
         This is the equivalent of the reference integration's embedder dropdown,
         exposed as a programmatic helper for AutoGen users to discover available
@@ -546,7 +554,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
         return body if isinstance(body, list) else body.get("embedders", [])
 
     async def list_spaces(self) -> List[Dict[str, Any]]:
-        """List all available spaces from the  API.
+        """List all available spaces from the GoodMem API.
 
         This is the equivalent of the reference integration's space dropdown,
         exposed as a programmatic helper for AutoGen users.
@@ -689,7 +697,7 @@ def _get_mime_type(extension: str) -> Optional[str]:
 
 
 def _parse_retrieve_response(response_text: str) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]], Any]:
-    """Parse  NDJSON/SSE retrieval response.
+    """Parse GoodMem NDJSON/SSE retrieval response.
 
     Mirrors the reference integration's response parsing logic.
 
