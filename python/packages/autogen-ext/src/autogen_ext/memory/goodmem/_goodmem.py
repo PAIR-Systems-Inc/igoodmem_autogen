@@ -395,8 +395,8 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
             }
 
         # Retrieval with wait-for-indexing polling (mirrors reference)
-        max_wait_seconds = 60
-        poll_interval_seconds = 5
+        max_wait_seconds = 10
+        poll_interval_seconds = 2
         should_wait = self._config.wait_for_indexing
         start_time = asyncio.get_event_loop().time()
         last_results: List[MemoryContent] = []
@@ -440,7 +440,7 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
 
             elapsed = asyncio.get_event_loop().time() - start_time
             if elapsed >= max_wait_seconds:
-                logger.warning("No results found after waiting 60 seconds for indexing")
+                logger.warning(f"No results found after waiting {max_wait_seconds} seconds for indexing")
                 break
 
             await asyncio.sleep(poll_interval_seconds)
@@ -600,10 +600,16 @@ class GoodMemMemory(Memory, Component[GoodMemMemoryConfig]):
                     # Cache if this is the default space
                     if space_name == self._config.space_name:
                         self._space_id = sid
+                    actual_embedder_id = emb_id
+                    space_embedders = space.get("spaceEmbedders", [])
+                    if space_embedders:
+                        first = space_embedders[0]
+                        if "embedderId" in first:
+                            actual_embedder_id = first["embedderId"]
                     return {
                         "spaceId": sid,
                         "name": space_name,
-                        "embedderId": emb_id,
+                        "embedderId": actual_embedder_id,
                         "reused": True,
                     }
         except Exception:
