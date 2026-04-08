@@ -1,23 +1,20 @@
-<a name="readme-top"></a>
-
 <div align="center">
-<img src="https://microsoft.github.io/autogen/0.2/img/ag.svg" alt="AutoGen Logo" width="100">
 
-[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40pyautogen)](https://twitter.com/pyautogen)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Company?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/105812540)
-[![Discord](https://img.shields.io/badge/discord-chat-green?logo=discord)](https://aka.ms/autogen-discord)
-[![Documentation](https://img.shields.io/badge/Documentation-AutoGen-blue?logo=read-the-docs)](https://microsoft.github.io/autogen/)
-[![Blog](https://img.shields.io/badge/Blog-AutoGen-blue?logo=blogger)](https://devblogs.microsoft.com/autogen/)
+<img src="https://goodmem.ai/assets/goodmem-g-blue-VvWv6-me.png" alt="GoodMem Logo" width="90">&nbsp;&nbsp;&nbsp;**X**&nbsp;&nbsp;&nbsp;<img src="https://microsoft.github.io/autogen/0.2/img/ag.svg" alt="AutoGen Logo" width="100">
 
 </div>
 
-# AutoGen
+# GoodMem × AutoGen
+
+**[GoodMem](https://goodmem.ai)** integration for **[AutoGen](https://github.com/microsoft/autogen)**: persistent semantic memory for multi-agent AI applications.
+
+This fork adds a GoodMem memory backend to AutoGen, enabling agents to store, retrieve, and reason over long-term memories using vector embeddings. Available for both Python and .NET.
+
+## Overview
+
+**GoodMem** is a context platform for AI agents. It enables efficient storage, retrieval, updates, and semantic searches of agentic "memories".
 
 **AutoGen** is a framework for creating multi-agent AI applications that can act autonomously or work alongside humans.
-
-> **Important:** if you are new to AutoGen, please checkout [Microsoft Agent Framework](https://github.com/microsoft/agent-framework).
-> AutoGen will still be maintained and continue to receive bug fixes and critical security patches.
-> Read our [announcement](https://github.com/microsoft/autogen/discussions/7066).
 
 ## Installation
 
